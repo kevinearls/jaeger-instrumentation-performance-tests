@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 public class JaegerPerformanceTestsVerticle extends AbstractVerticle {
-    private static final Integer SLEEP_INTERVAL = Integer.parseInt(System.getenv().getOrDefault("SLEEP_INTERVAL", "10"));
+    private static final Integer SLEEP_INTERVAL = Integer.parseInt(System.getenv().getOrDefault("SLEEP_INTERVAL", "1"));
     private static Logger logger = Logger.getLogger(JaegerPerformanceTestsVerticle.class.getName());
     private BackendService backendService;
 
