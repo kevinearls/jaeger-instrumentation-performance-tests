@@ -16,7 +16,7 @@ The test applications are very simple and each has the same 2 endpoints, *single
 environment variables can be used to alter the default behavior:
                                              
 + **TRACER_TYPE** The NoopTracer will be used if this is set to any value other than "jaeger"
-+ **SLEEP_INTERVAL** The number of milliseconds each action should sleep.  This defaults to 10.
++ **SLEEP_INTERVAL** The number of milliseconds each action should sleep.  This defaults to 1.
 + **TEST_SERVICE_NAME** Service name to use when reporting spans to jaeger.  Defaults to "framework-name-opentracing-demo", e.g. "vertx-opentracing-demo"
 + **JAEGER_SAMPLING_RATE** Set between 0.0 and 1.0 to set the sampling rate
 + **JAEGER_AGENT_HOST** Host the jaeger agent is running on, defaults to _localhost_
@@ -52,14 +52,14 @@ Note that `jaeger-host-ip` should be the real ip of the machine where you're run
 
 This section describes how to set up a Jenkins job and run the tests on an OpenShift instance.  At the
 current time, there are hard-coded dependencies on the project name, so the first thing you'll need to
-do is create a project named `jaeger-performance`
+do is create a project named `jaeger-infra`
 
-+ `oc new-project jaeger-performance`
++ `oc new-project jaeger-infra`
 
 ### Jenkins Creation
 
 Next create and configure a Jenkins instance on OpenShift.  Log onto OpenShift in a browser, 
-select the `jaeger-performance` project, and do the following:
+select the `jaeger-infra` project, and do the following:
 
 + Click on `Add to Project`
 + Select 'Continuous Integration and Deployment'
@@ -93,13 +93,14 @@ Log back into Jenkins, and select `New Item`
 + Select `This project is parameterized` and add the following parameters
     + *TRACER_TYPE* _Choice Parameter_ with values **JAEGER**, **NOOP**, or **NONE**
     + *TARGET_APP* _Choice Parameter_ with values **wildfly-swarm**, **spring-boot**, and **vertx**
-    + *JAEGER_AGENT_HOST* _String_ default `jaeger-agent.jaeger-performance.svc` description `Hostname for Jaeger Ageent`
+    + *JAEGER_AGENT_HOST* _String_ default `localhost` description `Hostname for Jaeger Ageent`
     + *JAEGER_SAMPLING_RATE* _String_ default `1.0` description `0.0 to 1.0 percent of spans to record`
     + *JMETER_CLIENT_COUNT* _String_ default `50`  description `The number of client threads JMeter should create`
     + *ITERATIONS* _String_ default `1000` description `The number of iterations each client should execute`
     + *RAMPUP* _String_ default `30` description 'The number of seconds to take to start all clients`
-    + *DELAY1* _String_ default `5` description `delay after hitting /singleSpan`
-    + *DELAY2* _String_ default `5` description `delay after hitting /spanWithChild`
+    * *SLEEP_INTERVAL* _String_ default `1` description `Delay for each call in application`
+    + *DELAY1* _String_ default `5` description `delay in JMeter script after hitting /singleSpan`
+    + *DELAY2* _String_ default `5` description `delay in JMeter scriptafter hitting /spanWithChild`
     + *DELETE_JAEGER_AT_END* _Boolean_ default `true` description `Delete Jaeger instance at end of the test`
     + *DELETE_EXAMPLE_AT_END* _Boolean_ default `true` description `Delete the target application at end of the test`
 + Scroll down to the **Pipeline** section and select `Pipeline script from SCM`
@@ -129,8 +130,8 @@ To run the performance test, use the following command:
 
 Each iteration of the test defined in `TestPlan/SimpleTracingTest.jmx` will hit 2 urls, `singleSpan`
 and `/spanWithChild`.  In addition to the variables above, there are two others that can be set to create a delay after each endpoing
-+ *DELAY1* sets a delay after hitting `/singleSpan`, default is *5* milliseconds
-+ *DELAY2* sets a delay after hitting `/spanWithChild`, default is *5* milliseconds
++ *DELAY1* sets a delay after hitting `/singleSpan`, default is *1* milliseconds
++ *DELAY2* sets a delay after hitting `/spanWithChild`, default is *1* millisecond
 
 
 
