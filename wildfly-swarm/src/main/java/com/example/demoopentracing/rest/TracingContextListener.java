@@ -1,18 +1,5 @@
 package com.example.demoopentracing.rest;
 
-import com.uber.jaeger.metrics.Metrics;
-import com.uber.jaeger.metrics.NullStatsReporter;
-import com.uber.jaeger.metrics.StatsFactoryImpl;
-import com.uber.jaeger.reporters.RemoteReporter;
-import com.uber.jaeger.reporters.Reporter;
-import com.uber.jaeger.samplers.ProbabilisticSampler;
-import com.uber.jaeger.samplers.Sampler;
-import com.uber.jaeger.senders.Sender;
-import com.uber.jaeger.senders.UdpSender;
-import io.opentracing.NoopTracerFactory;
-import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
-
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,37 +23,10 @@ public class TracingContextListener implements ServletContextListener {
     private static final String TEST_SERVICE_NAME = envs.getOrDefault("TEST_SERVICE_NAME", "wildfly-swarm-opentracing-demo");
     private static Logger logger = Logger.getLogger(TracingContextListener.class.getName());
 
-    @Inject
-    private io.opentracing.Tracer tracer;
-
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        GlobalTracer.register(tracer);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {}
-
-    @Produces
-    @Singleton
-    public static io.opentracing.Tracer jaegerTracer() {
-        Tracer tracer;
-
-        if (TRACER_TYPE.equalsIgnoreCase("jaeger")) {
-            logger.info("Using JAEGER tracer using host [" + JAEGER_AGENT_HOST + "] port [" + JAEGER_UDP_PORT +
-                    "] Service Name " + TEST_SERVICE_NAME + " Sampling rate " + JAEGER_SAMPLING_RATE);
-
-            Sender sender = new UdpSender(JAEGER_AGENT_HOST, JAEGER_UDP_PORT, JAEGER_MAX_PACKET_SIZE);
-            Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
-            Reporter reporter = new RemoteReporter(sender, JAEGER_FLUSH_INTERVAL, JAEGER_MAX_QUEUE_SIZE, metrics);
-            Sampler sampler = new ProbabilisticSampler(JAEGER_SAMPLING_RATE);
-            tracer = new com.uber.jaeger.Tracer.Builder(TEST_SERVICE_NAME, reporter, sampler)
-                    .build();
-        } else {
-            logger.info("Using NOOP Tracer");
-            tracer = NoopTracerFactory.create();
-        }
-
-        return tracer;
-    }
 }

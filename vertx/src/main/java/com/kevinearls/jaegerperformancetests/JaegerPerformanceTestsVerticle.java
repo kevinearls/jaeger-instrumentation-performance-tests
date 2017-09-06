@@ -1,8 +1,6 @@
 package com.kevinearls.jaegerperformancetests;
 
 import com.kevinearls.jaegerperformancetests.util.BackendService;
-import io.opentracing.Tracer;
-import io.opentracing.contrib.vertx.ext.web.TracingHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
@@ -12,8 +10,6 @@ import io.vertx.ext.web.RoutingContext;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import static com.kevinearls.jaegerperformancetests.util.TracerUtil.jaegerTracer;
-
 public class JaegerPerformanceTestsVerticle extends AbstractVerticle {
     private static final Integer SLEEP_INTERVAL = Integer.parseInt(System.getenv().getOrDefault("SLEEP_INTERVAL", "10"));
     private static Logger logger = Logger.getLogger(JaegerPerformanceTestsVerticle.class.getName());
@@ -21,18 +17,12 @@ public class JaegerPerformanceTestsVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        Tracer tracer = jaegerTracer();
-        TracingHandler tracingHandler = new TracingHandler(tracer);
-        backendService = new BackendService(tracer, tracingHandler);
+        backendService = new BackendService();
 
         Router router = Router.router(vertx);
         router.get("/").handler(this::singleSpan);
         router.get("/singleSpan").handler(this::singleSpan);
         router.get("/spanWithChild").handler(this::spanWithChild);
-
-        router.route()
-                .order(-1).handler(tracingHandler)
-                .failureHandler(tracingHandler);
 
         vertx.createHttpServer()
                 .requestHandler(router::accept)
