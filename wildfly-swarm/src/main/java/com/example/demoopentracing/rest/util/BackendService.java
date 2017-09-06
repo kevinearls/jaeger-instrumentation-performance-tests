@@ -13,6 +13,6 @@ public class BackendService {
     }
 
     private void anotherAction() {
-        logger.fine("tracer.activeSpan returned null");
+
     }
 }
