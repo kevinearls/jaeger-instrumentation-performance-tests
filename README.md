@@ -98,9 +98,8 @@ Log back into Jenkins, and select `New Item`
     + *ITERATIONS* _String_ default `1000` description `The number of iterations each client should execute`
     + *EXAMPLE_PODS* _String_ default `1` description 'The number of pods to deploy for the example application`
     + *RAMPUP* _String_ default `30` description 'The number of seconds to take to start all clients`
-    * *SLEEP_INTERVAL* _String_ default `1` description `Delay for each call in application`
-    + *DELAY1* _String_ default `5` description `delay in JMeter script after hitting /singleSpan`
-    + *DELAY2* _String_ default `5` description `delay in JMeter scriptafter hitting /spanWithChild`
+    + *DELAY1* _String_ default `5` description `delay after hitting /singleSpan`
+    + *DELAY2* _String_ default `5` description `delay after hitting /spanWithChild`
     + *DELETE_JAEGER_AT_END* _Boolean_ default `true` description `Delete Jaeger instance at end of the test`
     + *DELETE_EXAMPLE_AT_END* _Boolean_ default `true` description `Delete the target application at end of the test`
 + Scroll down to the **Pipeline** section and select `Pipeline script from SCM`
@@ -130,8 +129,8 @@ To run the performance test, use the following command:
 
 Each iteration of the test defined in `TestPlan/SimpleTracingTest.jmx` will hit 2 urls, `singleSpan`
 and `/spanWithChild`.  In addition to the variables above, there are two others that can be set to create a delay after each endpoing
-+ *DELAY1* sets a delay after hitting `/singleSpan`, default is *1* milliseconds
-+ *DELAY2* sets a delay after hitting `/spanWithChild`, default is *1* millisecond
++ *DELAY1* sets a delay after hitting `/singleSpan`, default is *5* milliseconds
++ *DELAY2* sets a delay after hitting `/spanWithChild`, default is *5* milliseconds
 
 
 
